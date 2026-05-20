@@ -1,0 +1,380 @@
+<!doctype html>
+<html lang="es">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Rutas por Carretera - UCS</title>
+	<style>
+		:root {
+			--primary: #2e7d32;
+			--primary-light: #c8e6c9;
+			--accent: #5d4037;
+			--bg-body: #eceff1;
+			--surface: #ffffff;
+			--text-main: #263238;
+			--text-light: #eceff1;
+			--border: #cfd8dc;
+		}
+
+		* {
+			box-sizing: border-box;
+		}
+
+		body {
+			margin: 0;
+			min-height: 100vh;
+			font-family: 'Segoe UI', system-ui, sans-serif;
+			background-color: var(--bg-body);
+			background: linear-gradient(135deg, #e8f5e9 0%, #d7ccc8 100%);
+			color: var(--text-main);
+			display: grid;
+			place-items: center;
+			padding: 20px;
+		}
+
+		.app {
+			width: 100%;
+			max-width: 900px;
+			background: var(--surface);
+			border-radius: 20px;
+			box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+			overflow: hidden;
+			display: grid;
+			grid-template-columns: 1fr;
+			animation: slideUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+		}
+
+		@keyframes slideUp {
+			from {
+				opacity: 0;
+				transform: translateY(40px);
+			}
+			to {
+				opacity: 1;
+				transform: translateY(0);
+			}
+		}
+
+		.header {
+			background: var(--primary);
+			color: white;
+			padding: 40px;
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+			position: relative;
+			overflow: hidden;
+		}
+
+		.header::after {
+			content: '';
+			position: absolute;
+			top: -60px;
+			right: -60px;
+			width: 200px;
+			height: 200px;
+			background: rgba(255, 255, 255, 0.1);
+			border-radius: 50%;
+		}
+
+		.eyebrow {
+			margin: 0 0 10px;
+			letter-spacing: 2px;
+			text-transform: uppercase;
+			color: #a5d6a7;
+			font-size: 0.75rem;
+			font-weight: 600;
+		}
+
+		h1 {
+			margin: 0 0 16px;
+			font-family: 'Georgia', serif;
+			font-size: 2.5rem;
+			line-height: 1.1;
+			font-weight: normal;
+		}
+
+		.subtitle {
+			margin: 0;
+			font-size: 0.95rem;
+			line-height: 1.6;
+			color: #c8e6c9;
+		}
+
+		.content {
+			padding: 40px;
+			display: grid;
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+			grid-auto-rows: minmax(min-content, max-content);
+			gap: 24px;
+			align-items: start;
+			align-content: start;
+			width: 100%;
+		}
+
+		.result {
+			grid-column: 1 / -1;
+		}
+
+		.fields {
+			display: grid;
+			grid-template-columns: 1fr;
+			gap: 20px;
+		}
+
+		form.panel {
+			background: #f7f9f4;
+			border: 1px solid rgba(44, 62, 80, 0.08);
+			border-radius: 18px;
+			padding: 24px;
+			box-shadow: 0 18px 40px rgba(0, 0, 0, 0.05);
+			min-height: auto;
+			overflow: visible;
+		}
+
+		form.panel.secondary {
+			background: #ffffff;
+			border-color: rgba(46, 125, 50, 0.18);
+			min-height: auto;
+		}
+
+		label {
+			display: grid;
+			gap: 8px;
+			font-weight: 600;
+			font-size: 0.85rem;
+			color: var(--accent);
+		}
+
+		input {
+			width: 100%;
+			padding: 14px 16px;
+			background: #f1f8e9;
+			border: 2px solid transparent;
+			border-radius: 8px;
+			font-size: 1rem;
+			color: var(--primary);
+			font-weight: 600;
+			transition: all 0.2s;
+		}
+
+		input:focus {
+			outline: none;
+			background: white;
+			border-color: var(--primary);
+			box-shadow: 0 4px 12px rgba(46, 125, 50, 0.1);
+		}
+
+		.actions {
+			display: flex;
+			gap: 16px;
+			margin-top: 10px;
+		}
+
+		button {
+			border: 0;
+			border-radius: 8px;
+			padding: 14px 24px;
+			font-size: 0.95rem;
+			font-weight: 600;
+			cursor: pointer;
+			transition: transform 0.1s;
+		}
+
+		button:active {
+			transform: scale(0.98);
+		}
+
+		.btn-primary {
+			background: var(--accent);
+			color: #fff;
+			box-shadow: 0 4px 10px rgba(93, 64, 55, 0.3);
+			flex: 1;
+		}
+
+		.btn-secondary {
+			background: white;
+			color: var(--accent);
+			border: 2px solid var(--accent);
+		}
+
+		button:disabled {
+			opacity: 0.65;
+		}
+
+		.message {
+			padding: 12px;
+			border-radius: 8px;
+			font-size: 0.9rem;
+			margin-top: 10px;
+			text-align: center;
+			font-weight: 500;
+		}
+
+		.message.ok {
+			background: #e8f5e9;
+			color: #2e7d32;
+		}
+
+		.message.error {
+			background: #ffebee;
+			color: #c62828;
+		}
+
+		.result {
+			margin-top: 20px;
+		}
+
+		.result h2 {
+			font-size: 0.8rem;
+			text-transform: uppercase;
+			letter-spacing: 1px;
+			color: var(--border);
+			border-bottom: 1px solid var(--border);
+			padding-bottom: 10px;
+			margin: 0 0 20px;
+		}
+
+		.route {
+			display: flex;
+			flex-direction: column;
+			padding-left: 10px;
+		}
+
+		.chip {
+			background: white;
+			color: var(--text-main);
+			padding: 12px 16px;
+			border-radius: 12px;
+			border: 1px solid var(--border);
+			font-weight: 600;
+			position: relative;
+			margin-bottom: 15px;
+			margin-left: 20px;
+			box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+			animation: fadeIn 0.4s ease backwards;
+		}
+
+	
+		.chip::before {
+			content: '';
+			position: absolute;
+			left: -26px;
+			top: 50%;
+			width: 12px;
+			height: 12px;
+			background: var(--primary);
+			border: 2px solid white;
+			outline: 2px solid var(--primary);
+			border-radius: 50%;
+			transform: translateY(-50%);
+			z-index: 2;
+		}
+
+		.chip:not(:last-child)::after {
+			content: '';
+			position: absolute;
+			left: -21px;
+			top: 50%;
+			height: calc(100% + 15px);
+			width: 2px;
+			background: var(--primary-light);
+			z-index: 1;
+		}
+
+		.arrow {
+			display: none;
+		}
+
+		@keyframes fadeIn {
+			from {
+				opacity: 0;
+				transform: translateX(-10px);
+			}
+			to {
+				opacity: 1;
+				transform: translateX(0);
+			}
+		}
+
+		@media (max-width: 768px) {
+			.app {
+				grid-template-columns: 1fr;
+				max-width: 500px;
+			}
+			.header {
+				padding: 30px 20px;
+				text-align: center;
+			}
+			.header::after {
+				display: none;
+			}
+			.content {
+				padding: 30px 20px;
+				grid-template-columns: 1fr;
+			}
+		}
+	</style>
+</head>
+<body>
+
+	<main class="app">
+		<header class="header">
+			<h1 style="margin-bottom:0;">Asignación óptima de ruedas</h1>
+			<p class="subtitle" style="margin-top:10px;">Introduce los precios de cada empresa para cada tipo de rueda:</p>
+		</header>
+		<section class="content" style="display:flex;justify-content:center;align-items:center;min-height:60vh;">
+			<form id="ruedas-form" class="panel" style="max-width:480px;width:100%;margin:auto;">
+				<table style="width:100%; border-collapse:collapse; margin-bottom:10px;">
+					<thead>
+						<tr style="background:#f1f8e9;">
+							<th></th>
+							<th>Tipo T</th>
+							<th>Tipo H</th>
+							<th>Tipo V</th>
+							<th>Tipo W</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<th>Empresa 1</th>
+							<td><input type="number" step="any" min="0" required name="e1t" /></td>
+							<td><input type="number" step="any" min="0" required name="e1h" /></td>
+							<td><input type="number" step="any" min="0" required name="e1v" /></td>
+							<td><input type="number" step="any" min="0" required name="e1w" /></td>
+						</tr>
+						<tr>
+							<th>Empresa 2</th>
+							<td><input type="number" step="any" min="0" required name="e2t" /></td>
+							<td><input type="number" step="any" min="0" required name="e2h" /></td>
+							<td><input type="number" step="any" min="0" required name="e2v" /></td>
+							<td><input type="number" step="any" min="0" required name="e2w" /></td>
+						</tr>
+						<tr>
+							<th>Empresa 3</th>
+							<td><input type="number" step="any" min="0" required name="e3t" /></td>
+							<td><input type="number" step="any" min="0" required name="e3h" /></td>
+							<td><input type="number" step="any" min="0" required name="e3v" /></td>
+							<td><input type="number" step="any" min="0" required name="e3w" /></td>
+						</tr>
+						<tr>
+							<th>Empresa 4</th>
+							<td><input type="number" step="any" min="0" required name="e4t" /></td>
+							<td><input type="number" step="any" min="0" required name="e4h" /></td>
+							<td><input type="number" step="any" min="0" required name="e4v" /></td>
+							<td><input type="number" step="any" min="0" required name="e4w" /></td>
+						</tr>
+					</tbody>
+				</table>
+				<div class="actions">
+					<button class="btn-primary" type="submit">Calcular asignación óptima</button>
+					<button class="btn-secondary" type="button" id="limpiar-ruedas-btn">Limpiar</button>
+				</div>
+				<div id="ruedas-resultado" style="margin-top:18px;"></div>
+			</form>
+		</section>
+	</main>
+
+	<script src="./main.js" defer></script>
+</body>
+</html>
