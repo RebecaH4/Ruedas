@@ -1,9 +1,19 @@
-from flask import Flask, request, jsonify
+
+from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 import itertools
+import os
 
-app = Flask(__name__)
+
+app = Flask(__name__, static_folder='app/static', template_folder='app')
 CORS(app)
+@app.route('/')
+def index():
+    return send_from_directory('app', 'index.html')
+
+@app.route('/main.js')
+def main_js():
+    return send_from_directory('app/static', 'main.js')
 
 @app.route('/ruedas', methods=['POST'])
 def ruedas_asignacion():
